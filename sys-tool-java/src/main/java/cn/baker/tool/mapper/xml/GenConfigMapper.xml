@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.baker.tool.mapper.GenConfigMapper">
+
+
+    <resultMap id="BaseResultMap" type="cn.baker.tool.entity.GenConfig">
+        <result property="id" column="config_id"/>
+        <result property="tableName" column="table_name"/>
+        <result property="author" column="author"/>
+        <result property="cover" column="cover"/>
+        <result property="moduleName" column="module_name"/>
+        <result property="pack" column="pack"/>
+        <result property="path" column="path"/>
+        <result property="apiPath" column="api_path"/>
+        <result property="prefix" column="prefix"/>
+        <result property="apiAlias" column="api_alias"/>
+    </resultMap>
+
+
+    <select id="findByTableName" resultMap="BaseResultMap">
+        select *
+        from code_gen_config
+        where table_name = #{tableName}
+    </select>
+
+</mapper>
