@@ -19,7 +19,7 @@
         <result property="dateAnnotation" column="date_annotation"/>
     </resultMap>
 
-    <select id="getTables" resultType="cn.baker.tool.entity.vo.TableInfo">
+    <select id="getTables" resultType="cn.baker.tool.entity.vo.TableInfoVO">
         select table_name      as tableName,
                create_time     as createTime,
                engine          as engine,
@@ -31,7 +31,7 @@
     </select>
 
 
-    <select id="getTablesByName" resultType="cn.baker.tool.entity.vo.TableInfo">
+    <select id="getTablesByName" resultType="cn.baker.tool.entity.vo.TableInfoVO">
         select table_name      as tableName,
                create_time     as createTime,
                engine          as engine,

@@ -1,7 +1,7 @@
 package cn.baker.tool.mapper;
 
 import cn.baker.tool.entity.ColumnInfo;
-import cn.baker.tool.entity.vo.TableInfo;
+import cn.baker.tool.entity.vo.TableInfoVO;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -18,7 +18,7 @@ public interface ColumnInfoMapper extends Mapper<ColumnInfo> {
      *
      * @return
      */
-    List<TableInfo> getTables();
+    List<TableInfoVO> getTables();
 
     /**
      * 模糊查询表的定义信息
@@ -26,7 +26,7 @@ public interface ColumnInfoMapper extends Mapper<ColumnInfo> {
      * @param name 表名
      * @return
      */
-    List<TableInfo> getTablesByName(@Param("name") String name);
+    List<TableInfoVO> getTablesByName(@Param("name") String name);
 
     /**
      * 根据表名查询表中列的定义信息

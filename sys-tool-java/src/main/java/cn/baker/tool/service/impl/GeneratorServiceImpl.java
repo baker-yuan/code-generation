@@ -4,7 +4,7 @@ import cn.baker.common.exception.BizException;
 import cn.baker.common.search.PageResult;
 import cn.baker.tool.entity.ColumnInfo;
 import cn.baker.tool.entity.GenConfig;
-import cn.baker.tool.entity.vo.TableInfo;
+import cn.baker.tool.entity.vo.TableInfoVO;
 import cn.baker.tool.mapper.ColumnInfoMapper;
 import cn.baker.tool.service.GeneratorService;
 import cn.baker.tool.utils.FileUtil;
@@ -42,14 +42,14 @@ public class GeneratorServiceImpl implements GeneratorService {
     private ColumnInfoMapper columnInfoMapper;
 
     @Override
-    public List<TableInfo> getTables() {
+    public List<TableInfoVO> getTables() {
         return columnInfoMapper.getTables();
     }
 
     @Override
-    public PageResult<TableInfo> getTables(String name, Integer page, Integer size) {
+    public PageResult<TableInfoVO> getTables(String name, Integer page, Integer size) {
         PageHelper.startPage(page, size);
-        Page<TableInfo> res = (Page<TableInfo>) columnInfoMapper.getTablesByName(name);
+        Page<TableInfoVO> res = (Page<TableInfoVO>) columnInfoMapper.getTablesByName(name);
         if (CollectionUtils.isNotEmpty(res.getResult())) {
             return new PageResult<>(res.getTotal(), res.getResult());
         }

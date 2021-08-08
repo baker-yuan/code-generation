@@ -4,7 +4,7 @@ import cn.baker.common.response.ResResult;
 import cn.baker.common.search.PageResult;
 import cn.baker.tool.entity.ColumnInfo;
 import cn.baker.tool.entity.dto.GeneratorDTO;
-import cn.baker.tool.entity.vo.TableInfo;
+import cn.baker.tool.entity.vo.TableInfoVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -24,11 +24,11 @@ public interface GeneratorApi {
 
     @ApiOperation("查询数据库数据")
     @GetMapping(value = "/api/generator/tables/all")
-    ResResult<List<TableInfo>> queryTables();
+    ResResult<List<TableInfoVO>> queryTables();
 
     @ApiOperation("查询数据库数据")
     @GetMapping(value = "/api/generator/tables")
-    ResResult<PageResult<TableInfo>> queryTables(@RequestParam String name, @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size);
+    ResResult<PageResult<TableInfoVO>> queryTables(@RequestParam String name, @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size);
 
     @ApiOperation("查询字段数据")
     @GetMapping(value = "/api/generator/columns")

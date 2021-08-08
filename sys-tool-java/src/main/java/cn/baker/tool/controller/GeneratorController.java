@@ -8,7 +8,7 @@ import cn.baker.common.search.PageResult;
 import cn.baker.tool.entity.ColumnInfo;
 import cn.baker.tool.entity.GenConfig;
 import cn.baker.tool.entity.dto.GeneratorDTO;
-import cn.baker.tool.entity.vo.TableInfo;
+import cn.baker.tool.entity.vo.TableInfoVO;
 import cn.baker.tool.export.GeneratorApi;
 import cn.baker.tool.service.GenConfigService;
 import cn.baker.tool.service.GeneratorService;
@@ -40,14 +40,14 @@ public class GeneratorController implements GeneratorApi {
     private GenConfigService genConfigService;
 
     @Override
-    public ResResult<List<TableInfo>> queryTables() {
+    public ResResult<List<TableInfoVO>> queryTables() {
         return ResUtils.data(generatorService.getTables());
     }
 
     @Override
-    public ResResult<PageResult<TableInfo>> queryTables(@RequestParam String name,
-                                                        @RequestParam(defaultValue = "1") Integer page,
-                                                        @RequestParam(defaultValue = "10") Integer size) {
+    public ResResult<PageResult<TableInfoVO>> queryTables(@RequestParam String name,
+                                                          @RequestParam(defaultValue = "1") Integer page,
+                                                          @RequestParam(defaultValue = "10") Integer size) {
         return ResUtils.data(generatorService.getTables(name, page, size));
     }
 

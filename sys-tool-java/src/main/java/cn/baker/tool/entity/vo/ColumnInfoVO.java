@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ColumnInfo {
+public class ColumnInfoVO {
     private String columnName;
     private String isNullable;
     private String dataType;

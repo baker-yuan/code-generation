@@ -4,7 +4,7 @@ package cn.baker.tool.service;
 import cn.baker.common.search.PageResult;
 import cn.baker.tool.entity.ColumnInfo;
 import cn.baker.tool.entity.GenConfig;
-import cn.baker.tool.entity.vo.TableInfo;
+import cn.baker.tool.entity.vo.TableInfoVO;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +22,7 @@ public interface GeneratorService {
      *
      * @return /
      */
-    List<TableInfo> getTables();
+    List<TableInfoVO> getTables();
 
 
     /**
@@ -33,7 +33,7 @@ public interface GeneratorService {
      * @param size 页面大小
      * @return /
      */
-    PageResult<TableInfo> getTables(String name, Integer page, Integer size);
+    PageResult<TableInfoVO> getTables(String name, Integer page, Integer size);
 
     /**
      * 得到数据表的元数据

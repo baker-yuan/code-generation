@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TableInfo {
+public class TableInfoVO {
     /**
      * 表名称
      */
