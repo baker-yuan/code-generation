@@ -32,8 +32,7 @@ public class DataSourceAutoConfig implements BeanFactoryPostProcessor, Environme
 
     private String dataSourceConfig;
 
-    private List<Pair<String, DataSource>> dataSourceList;
-
+    private ConfigurableListableBeanFactory beanFactory;
 
     @Bean("mainDataSource")
     //@ConfigurationProperties("spring.datasource")
@@ -44,7 +43,6 @@ public class DataSourceAutoConfig implements BeanFactoryPostProcessor, Environme
                 .url("jdbc:mysql://121.36.33.154:3306/ren_ren_fast?characterEncoding=utf-8&useUnicode=true&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&allowMultiQueries=true")
                 .driverClassName("com.mysql.cj.jdbc.Driver")
                 .build();
-
         return dataSource;
     }
 
@@ -53,8 +51,10 @@ public class DataSourceAutoConfig implements BeanFactoryPostProcessor, Environme
     public DynamicDataSource dynamicDataSource(DataSource mainDataSource) {
         Map<Object, Object> targetDataSources = new HashMap<>();
         targetDataSources.put("mainDataSource", mainDataSource);
-        for (Pair<String, DataSource> pair : this.dataSourceList) {
-            targetDataSources.put(pair.getKey(), pair.getValue());
+
+        Map<String, DataSource> beanMap = beanFactory.getBeansOfType(DataSource.class);
+        if (beanMap != null && !beanMap.isEmpty()) {
+            targetDataSources.putAll(beanMap);
         }
 
         DynamicDataSource ds = new DynamicDataSource();
@@ -72,8 +72,8 @@ public class DataSourceAutoConfig implements BeanFactoryPostProcessor, Environme
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
         List<Pair<String, DataSource>> dataSourceList = parseConfig();
-        this.dataSourceList = dataSourceList;
         for (Pair<String, DataSource> pair : dataSourceList) {
             beanFactory.registerSingleton(pair.getKey(), pair.getValue());
         }

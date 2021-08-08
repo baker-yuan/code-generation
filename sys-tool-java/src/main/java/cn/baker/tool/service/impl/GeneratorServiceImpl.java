@@ -42,15 +42,18 @@ public class GeneratorServiceImpl implements GeneratorService {
 
     @Override
     public List<TableInfoVO> getTables(String dbName) {
-        return columnInfoMapper.getTables(dbName);
+        DynamicDataSourceContextHolder.setDataSourceName(dbName);
+        List<TableInfoVO> tableInfoVoList = columnInfoMapper.getTables();
+        DynamicDataSourceContextHolder.clear();
+        return tableInfoVoList;
     }
 
     @Override
     public PageResult<TableInfoVO> getTables(String dbName, String tbName, Integer page, Integer size) {
         DynamicDataSourceContextHolder.setDataSourceName(dbName);
-        Integer count = columnInfoMapper.getTablesByNameCount(dbName, tbName);
+        Integer count = columnInfoMapper.getTablesByNameCount(tbName);
         Integer start = (page - 1) * size;
-        List<TableInfoVO> res = columnInfoMapper.getTablesByName(dbName, tbName, start, size);
+        List<TableInfoVO> res = columnInfoMapper.getTablesByName(tbName, start, size);
         if (CollectionUtils.isNotEmpty(res)) {
             return new PageResult<>(count, res);
         }
@@ -63,7 +66,7 @@ public class GeneratorServiceImpl implements GeneratorService {
     public List<ColumnInfo> query(String dbName, String tableName) {
         List<ColumnInfo> columnInfoList = Lists.newArrayList();
         DynamicDataSourceContextHolder.setDataSourceName(dbName);
-        List<Map<String, String>> columnInfoListMap = columnInfoMapper.queryByTableName(dbName, tableName);
+        List<Map<String, String>> columnInfoListMap = columnInfoMapper.queryByTableName(tableName);
         DynamicDataSourceContextHolder.clear();
         if (CollectionUtils.isEmpty(columnInfoListMap)) {
             return Lists.newArrayList();
