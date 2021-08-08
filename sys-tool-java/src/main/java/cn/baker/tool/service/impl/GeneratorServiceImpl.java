@@ -2,6 +2,7 @@ package cn.baker.tool.service.impl;
 
 import cn.baker.common.exception.BizException;
 import cn.baker.common.search.PageResult;
+import cn.baker.tool.config.DynamicDataSourceContextHolder;
 import cn.baker.tool.entity.ColumnInfo;
 import cn.baker.tool.entity.GenConfig;
 import cn.baker.tool.entity.vo.TableInfoVO;
@@ -11,8 +12,6 @@ import cn.baker.tool.utils.FileUtil;
 import cn.baker.tool.utils.GenUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ZipUtil;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -42,36 +41,30 @@ public class GeneratorServiceImpl implements GeneratorService {
     private ColumnInfoMapper columnInfoMapper;
 
     @Override
-    public List<TableInfoVO> getTables() {
-        return columnInfoMapper.getTables();
+    public List<TableInfoVO> getTables(String dbName) {
+        return columnInfoMapper.getTables(dbName);
     }
 
     @Override
-    public PageResult<TableInfoVO> getTables(String name, Integer page, Integer size) {
-        PageHelper.startPage(page, size);
-        Page<TableInfoVO> res = (Page<TableInfoVO>) columnInfoMapper.getTablesByName(name);
-        if (CollectionUtils.isNotEmpty(res.getResult())) {
-            return new PageResult<>(res.getTotal(), res.getResult());
+    public PageResult<TableInfoVO> getTables(String dbName, String tbName, Integer page, Integer size) {
+        DynamicDataSourceContextHolder.setDataSourceName(dbName);
+        Integer count = columnInfoMapper.getTablesByNameCount(dbName, tbName);
+        Integer start = (page - 1) * size;
+        List<TableInfoVO> res = columnInfoMapper.getTablesByName(dbName, tbName, start, size);
+        if (CollectionUtils.isNotEmpty(res)) {
+            return new PageResult<>(count, res);
         }
+        DynamicDataSourceContextHolder.clear();
         return new PageResult<>(0, Lists.newArrayList());
     }
 
-    @Override
-    public List<ColumnInfo> getColumns(String tableName) {
-        List<ColumnInfo> columnInfos = columnInfoMapper.findByTableNameOrderByIdAsc(tableName);
-        if (CollectionUtils.isNotEmpty(columnInfos)) {
-            return columnInfos;
-        } else {
-            columnInfos = query(tableName);
-            columnInfoMapper.batchInsert(columnInfos);
-            return columnInfoMapper.findByTableNameOrderByIdAsc(tableName);
-        }
-    }
 
     @Override
-    public List<ColumnInfo> query(String tableName) {
+    public List<ColumnInfo> query(String dbName, String tableName) {
         List<ColumnInfo> columnInfoList = Lists.newArrayList();
-        List<Map<String, String>> columnInfoListMap = columnInfoMapper.queryByTableName(tableName);
+        DynamicDataSourceContextHolder.setDataSourceName(dbName);
+        List<Map<String, String>> columnInfoListMap = columnInfoMapper.queryByTableName(dbName, tableName);
+        DynamicDataSourceContextHolder.clear();
         if (CollectionUtils.isEmpty(columnInfoListMap)) {
             return Lists.newArrayList();
         }
@@ -87,6 +80,20 @@ public class GeneratorServiceImpl implements GeneratorService {
         }
         return columnInfoList;
     }
+
+
+    @Override
+    public List<ColumnInfo> getColumns(String dbName, String tableName) {
+        List<ColumnInfo> columnInfos = columnInfoMapper.findByTableNameOrderByIdAsc(tableName);
+        if (CollectionUtils.isNotEmpty(columnInfos)) {
+            return columnInfos;
+        } else {
+            columnInfos = query(dbName, tableName);
+            columnInfoMapper.batchInsert(columnInfos);
+            return columnInfoMapper.findByTableNameOrderByIdAsc(tableName);
+        }
+    }
+
 
     @Override
     public void sync(List<ColumnInfo> columnInfos, List<ColumnInfo> columnInfoList) {
@@ -150,7 +157,7 @@ public class GeneratorServiceImpl implements GeneratorService {
 
     @Override
     public void download(GenConfig genConfig, List<ColumnInfo> columns, HttpServletRequest request, HttpServletResponse response) {
-        if (genConfig.getId() == null) {
+        if (genConfig == null) {
             throw new BizException("请先配置生成器");
         }
         try {

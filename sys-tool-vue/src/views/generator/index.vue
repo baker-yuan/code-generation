@@ -1,13 +1,23 @@
 <template>
   <div class="app-container">
     <div class="head-container">
+      <div>
+        <el-select v-model="dataForm.dbName" @change="handSelectChange" placeholder="请选择">
+          <el-option
+              v-for="item in dbOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+          </el-option>
+        </el-select>
+      </div>
       <!-- 搜索表单 -->
       <el-form
           :inline="false"
           :model="dataForm"
           @keyup.enter.native="getDataList()">
         <el-form-item>
-          <el-input v-model="dataForm.name"
+          <el-input v-model="dataForm.tbName"
                     clearable
                     size="small"
                     placeholder="请输入表名"
@@ -42,10 +52,19 @@
       <el-table-column prop="createTime" label="创建日期"/>
       <el-table-column label="操作" width="160px" align="center" fixed="right">
         <template slot-scope="scope">
-          <el-button size="mini" style="margin-right: 2px" type="text">
-            <router-link :to="{ name: 'PREVIEW', params: { tableName: scope.row.tableName }}">
+          <!--
+           <el-button size="mini" style="margin-right: 2px" type="text">
+            <router-link :to="{ name: 'PREVIEW', params: { dbName: 'this.dataForm.dbName', tbName: scope.row.tableName }}">
               预览
             </router-link>
+           </el-button>
+
+          -->
+          <el-button size="mini"
+                     style="margin-right: 2px"
+                     type="text"
+                     @click="toPreview(scope.row.tableName)"
+          >预览
           </el-button>
           <el-button size="mini" style="margin-left: -1px;margin-right: 2px" type="text"
                      @click="toDownload(scope.row.tableName)">下载
@@ -86,22 +105,34 @@ export default {
       totalPage: 0,
       dataListSelections: [],
       dataForm: {
-        name: ''
+        dbName: '',
+        tbName: ''
       },
-      syncLoading: false
+      syncLoading: false,
+      dbOptions: [
+        {
+          value: 'xxx_sys_acc',
+          label: 'xxx_sys_acc'
+        },
+        {
+          value: 'xxx_sys_pem',
+          label: 'xxx_sys_pem'
+        }
+      ]
     }
   },
   created() {
+    this.dataForm.dbName = this.dbOptions[0].value
     this.getDataList()
   },
   methods: {
     // 查询数据库元数据
     getDataList() {
       this.$http({
-        url: this.$http.adornUrl('api/generator/tables'),
+        url: this.$http.adornUrl(`api/generator/tables/${this.dataForm.dbName}`),
         method: 'get',
         params: this.$http.adornParams({
-          'name': this.dataForm.name,
+          'tbName': this.dataForm.tbName,
           'page': this.pageIndex,
           'size': this.pageSize,
         })
@@ -124,6 +155,10 @@ export default {
     // 多选
     selectionChangeHandle(val) {
       this.dataListSelections = val
+    },
+    handSelectChange(value) {
+      this.dataForm.dbName = value
+      this.getDataList()
     },
     /**
      * 生成代码
@@ -162,6 +197,11 @@ export default {
         downloadFile(data, tableName, 'zip')
       })
     },
+    toPreview(tableName) {
+      //{ name: 'PREVIEW', params: { dbName: 'this.dataForm.dbName', tbName: scope.row.tableName }}
+      this.$router.push({ name: 'PREVIEW', params: { dbName: this.dataForm.dbName, tbName: tableName }})
+    },
+
 
     /**
      *

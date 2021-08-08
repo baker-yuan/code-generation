@@ -22,18 +22,27 @@ public interface GeneratorService {
      *
      * @return /
      */
-    List<TableInfoVO> getTables();
+    List<TableInfoVO> getTables(String dbName);
 
 
     /**
      * 查询数据库元数据
      *
-     * @param name 表名
+     * @param tbName 表名
      * @param page 页码
      * @param size 页面大小
      * @return /
      */
-    PageResult<TableInfoVO> getTables(String name, Integer page, Integer size);
+    PageResult<TableInfoVO> getTables(String dbName, String tbName, Integer page, Integer size);
+
+    /**
+     * 查询数据库的表字段数据数据
+     *
+     * @param table /
+     * @return /
+     */
+    List<ColumnInfo> query(String dbName, String table);
+
 
     /**
      * 得到数据表的元数据
@@ -41,7 +50,7 @@ public interface GeneratorService {
      * @param name 表名
      * @return /
      */
-    List<ColumnInfo> getColumns(String name);
+    List<ColumnInfo> getColumns(String dbName, String name);
 
     /**
      * 同步表数据
@@ -85,12 +94,4 @@ public interface GeneratorService {
      * @param response  /
      */
     void download(GenConfig genConfig, List<ColumnInfo> columns, HttpServletRequest request, HttpServletResponse response);
-
-    /**
-     * 查询数据库的表字段数据数据
-     *
-     * @param table /
-     * @return /
-     */
-    List<ColumnInfo> query(String table);
 }

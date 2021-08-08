@@ -5,6 +5,7 @@ import cn.baker.common.exception.BizException;
 import cn.baker.common.response.ResResult;
 import cn.baker.common.response.ResUtils;
 import cn.baker.common.search.PageResult;
+import cn.baker.tool.config.DynamicDataSourceContextHolder;
 import cn.baker.tool.entity.ColumnInfo;
 import cn.baker.tool.entity.GenConfig;
 import cn.baker.tool.entity.dto.GeneratorDTO;
@@ -40,20 +41,29 @@ public class GeneratorController implements GeneratorApi {
     private GenConfigService genConfigService;
 
     @Override
-    public ResResult<List<TableInfoVO>> queryTables() {
-        return ResUtils.data(generatorService.getTables());
+    public ResResult<List<TableInfoVO>> queryTables(String dbName) {
+        return ResUtils.data(generatorService.getTables(dbName));
     }
 
     @Override
-    public ResResult<PageResult<TableInfoVO>> queryTables(@RequestParam String name,
+    public ResResult<PageResult<TableInfoVO>> queryTables(@PathVariable("dbName") String dbName,
+                                                          @RequestParam String tbName,
                                                           @RequestParam(defaultValue = "1") Integer page,
                                                           @RequestParam(defaultValue = "10") Integer size) {
-        return ResUtils.data(generatorService.getTables(name, page, size));
+        return ResUtils.data(generatorService.getTables(dbName, tbName, page, size));
     }
 
     @Override
-    public ResResult<List<ColumnInfo>> queryColumns(@RequestParam String tableName) {
-        return ResUtils.data(generatorService.getColumns(tableName));
+    public ResponseEntity<HttpStatus> sync(@RequestBody @Validated GeneratorDTO.SyncDTO dto) {
+        for (String table : dto.getTables()) {
+            generatorService.sync(generatorService.getColumns(dto.getDbName(), table), generatorService.query(dto.getDbName(), table));
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public ResResult<List<ColumnInfo>> queryColumns(@PathVariable("dbName") String dbName, @RequestParam String tableName) {
+        return ResUtils.data(generatorService.getColumns(dbName, tableName));
     }
 
     @Override
@@ -62,21 +72,16 @@ public class GeneratorController implements GeneratorApi {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Override
-    public ResponseEntity<HttpStatus> sync(@RequestBody @Validated GeneratorDTO.SyncDTO dto) {
-        for (String table : dto.getTables()) {
-            generatorService.sync(generatorService.getColumns(table), generatorService.query(table));
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+
 
     @Override
-    public ResResult<?> generator(@PathVariable String tableName, @PathVariable Integer type, HttpServletRequest request, HttpServletResponse response) {
+    public ResResult<?> generator(@PathVariable("dbName") String dbName, @PathVariable("tbName") String tbName, @PathVariable Integer type, HttpServletRequest request, HttpServletResponse response) {
         if (!generatorEnabled && type == 0) {
             throw new BizException("此环境不允许生成代码，请选择预览或者下载查看！");
         }
-        GenConfig genConfig = genConfigService.find(tableName);
-        List<ColumnInfo> columnInfoList = generatorService.getColumns(tableName);
+        DynamicDataSourceContextHolder.clear();
+        GenConfig genConfig = genConfigService.find(tbName);
+        List<ColumnInfo> columnInfoList = generatorService.getColumns(dbName, tbName);
         switch (type) {
             // 生成代码
             case 0:

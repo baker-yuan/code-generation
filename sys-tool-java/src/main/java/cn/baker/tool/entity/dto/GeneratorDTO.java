@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 /**
  * @author baker.yuan
@@ -21,7 +23,12 @@ public class GeneratorDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static final class SyncDTO {
+        @NotEmpty
         @ApiModelProperty("表名")
         List<String> tables;
+
+        @NotBlank
+        @ApiModelProperty("库表名")
+        private String dbName;
     }
 }

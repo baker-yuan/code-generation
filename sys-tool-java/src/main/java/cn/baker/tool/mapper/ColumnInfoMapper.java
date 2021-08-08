@@ -18,15 +18,17 @@ public interface ColumnInfoMapper extends Mapper<ColumnInfo> {
      *
      * @return
      */
-    List<TableInfoVO> getTables();
+    List<TableInfoVO> getTables(@Param("dbName") String dbName);
 
     /**
      * 模糊查询表的定义信息
      *
-     * @param name 表名
+     * @param tbName 表名
      * @return
      */
-    List<TableInfoVO> getTablesByName(@Param("name") String name);
+    List<TableInfoVO> getTablesByName(@Param("dbName") String dbName, @Param("tbName") String tbName, @Param("start")Integer start, @Param("size") Integer size);
+
+    Integer getTablesByNameCount(@Param("dbName") String dbName, @Param("tbName") String tbName);
 
     /**
      * 根据表名查询表中列的定义信息
@@ -34,7 +36,7 @@ public interface ColumnInfoMapper extends Mapper<ColumnInfo> {
      * @param tableName 表名
      * @return
      */
-    List<Map<String, String>> queryByTableName(@Param("tableName") String tableName);
+    List<Map<String, String>> queryByTableName(@Param("dbName") String dbName, @Param("tableName") String tableName);
 
 
     /**

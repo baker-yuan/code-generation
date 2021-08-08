@@ -23,16 +23,18 @@ import java.util.List;
 public interface GeneratorApi {
 
     @ApiOperation("查询数据库数据")
-    @GetMapping(value = "/api/generator/tables/all")
-    ResResult<List<TableInfoVO>> queryTables();
+    @GetMapping(value = "/api/generator/tables/all/{dbName}")
+    ResResult<List<TableInfoVO>> queryTables(@PathVariable("dbName") String dbName);
 
     @ApiOperation("查询数据库数据")
-    @GetMapping(value = "/api/generator/tables")
-    ResResult<PageResult<TableInfoVO>> queryTables(@RequestParam String name, @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size);
+    @GetMapping(value = "/api/generator/tables/{dbName}")
+    ResResult<PageResult<TableInfoVO>> queryTables(@PathVariable("dbName") String dbName, @RequestParam String tbName, @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size);
 
     @ApiOperation("查询字段数据")
     @GetMapping(value = "/api/generator/columns")
-    ResResult<List<ColumnInfo>> queryColumns(@RequestParam String tableName);
+    ResResult<List<ColumnInfo>> queryColumns(@PathVariable("dbName") String dbName, @RequestParam String tableName);
+
+
 
     @ApiOperation("保存字段数据")
     @PutMapping("/api/generator")
@@ -43,6 +45,6 @@ public interface GeneratorApi {
     ResponseEntity<HttpStatus> sync(@RequestBody @Validated GeneratorDTO.SyncDTO dto);
 
     @ApiOperation("生成代码")
-    @PostMapping(value = "/api/generator/{tableName}/{type}")
-    ResResult<?> generator(@PathVariable String tableName, @PathVariable Integer type, HttpServletRequest request, HttpServletResponse response);
+    @PostMapping(value = "/api/generator/{dbName}/{tbName}/{type}")
+    ResResult<?> generator(@PathVariable("dbName") String dbName,  @PathVariable("tbName") String tableName, @PathVariable Integer type, HttpServletRequest request, HttpServletResponse response);
 }

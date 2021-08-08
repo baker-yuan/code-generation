@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @Api(tags = "系统：代码生成器配置管理")
 public interface GenConfigApi {
+
     @ApiOperation("查询")
     @GetMapping(value = "/api/genConfig/{tableName}")
     ResResult<GenConfig> query(@PathVariable String tableName) ;
@@ -22,4 +23,5 @@ public interface GenConfigApi {
     @ApiOperation("修改")
     @PutMapping("/api/genConfig")
     ResResult<GenConfig> update(@Validated @RequestBody GenConfig genConfig) ;
+
 }

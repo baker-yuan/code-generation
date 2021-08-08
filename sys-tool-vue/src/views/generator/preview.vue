@@ -13,14 +13,17 @@ export default {
   components: { Java },
   data() {
     return {
-      data: null, height: '', activeName: 'Entity'
+      data: null,
+      height: '',
+      activeName: 'Entity'
     }
   },
   created() {
     this.height = document.documentElement.clientHeight - 180 + 'px'
-    const tableName = this.$route.params.tableName
+    const tbName = this.$route.params.tbName
+    const dbName = this.$route.params.dbName
     this.$http({
-      url: this.$http.adornUrl('api/generator/' + tableName + '/' + 1),
+      url: this.$http.adornUrl(`api/generator/${dbName}/${tbName}/1`),
       method: 'post',
       data: this.$http.adornData({})
     }).then(({data}) => {

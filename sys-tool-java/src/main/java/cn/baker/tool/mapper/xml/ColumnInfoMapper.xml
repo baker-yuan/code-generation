@@ -20,11 +20,11 @@
     </resultMap>
 
     <select id="getTables" resultType="cn.baker.tool.entity.vo.TableInfoVO">
-        select table_name      as tableName,
-               create_time     as createTime,
-               engine          as engine,
-               table_collation as tableCollation,
-               table_comment   as tableComment
+        select `table_name`      as tableName,
+               `create_time`     as createTime,
+               `engine`          as engine,
+               `table_collation` as tableCollation,
+               `table_comment`   as tableComment
         from information_schema.tables
         where table_schema = (select database())
         order by create_time desc
@@ -32,16 +32,30 @@
 
 
     <select id="getTablesByName" resultType="cn.baker.tool.entity.vo.TableInfoVO">
-        select table_name      as tableName,
-               create_time     as createTime,
-               engine          as engine,
-               table_collation as tableCollation,
-               table_comment   as tableComment
+        select `table_name`      as tableName,
+               `create_time`     as createTime,
+               `engine`         as engine,
+               `table_collation` as tableCollation,
+               `table_comment`   as tableComment
         from information_schema.tables
         where table_schema = (select database())
-          and table_name like concat('%', #{name}, '%')
+        <if test="tbName != null and tbName != ''">
+            and `table_name` like concat('%', #{tbName}, '%')
+        </if>
+        order by create_time desc
+        limit #{start}, #{size}
+    </select>
+
+    <select id="getTablesByNameCount" resultType="java.lang.Integer">
+        select count(1)
+        from information_schema.tables
+        where table_schema = (select database())
+        <if test="tbName != null and tbName != ''">
+            and `table_name` like concat('%', #{tbName}, '%')
+        </if>
         order by create_time desc
     </select>
+
 
     <select id="queryByTableName" resultType="java.util.Map">
         select column_name    as columnName,
@@ -66,7 +80,7 @@
 
 
     <insert id="batchInsert" parameterType="cn.baker.tool.entity.ColumnInfo">
-        insert into code_column_config(column_id, table_name, column_name, column_type, dict_name, extra, form_show, form_type, key_type, list_show, not_null, query_type, remark, date_annotation)
+        insert into code_column_config(`column_id`, `table_name`, `column_name`, `column_type`, `dict_name`, `extra`, `form_show`, `form_type`, `key_type`, `list_show`, not_null, `query_type`, `remark`, `date_annotation`)
         values
         <foreach collection="columnInfoList" item="columnInfo" index="index" separator=",">
             (null,#{columnInfo.tableName},#{columnInfo.columnName},#{columnInfo.columnType},#{columnInfo.dictName},#{columnInfo.extra},#{columnInfo.formShow},#{columnInfo.formType},#{columnInfo.keyType},#{columnInfo.listShow},#{columnInfo.notNull},#{columnInfo.queryType},#{columnInfo.remark},#{columnInfo.dateAnnotation})
